@@ -25,11 +25,11 @@ CALL = "call"
 PUT = "put"
 
 
-def _validate(S, K, T, sigma, option_type):
+def check_inputs(S, K, T, sigma, option_type=None):
     """Check the inputs make sense, and raise a clear error if they do not.
 
-    Better to stop here than let a bad number become a wrong answer somewhere
-    deep in the implied volatility solver.
+    Shared with greeks.py. Better to stop here than let a bad number become a
+    wrong answer somewhere deep in the implied volatility solver.
     """
     if S <= 0:
         raise ValueError(f"Spot price S must be positive, got {S}")
@@ -39,7 +39,7 @@ def _validate(S, K, T, sigma, option_type):
         raise ValueError(f"Time to expiry T cannot be negative, got {T}")
     if sigma < 0:
         raise ValueError(f"Volatility sigma cannot be negative, got {sigma}")
-    if option_type not in (CALL, PUT):
+    if option_type is not None and option_type not in (CALL, PUT):
         raise ValueError(f"option_type must be '{CALL}' or '{PUT}', got {option_type!r}")
 
 
@@ -105,7 +105,7 @@ def bs_price(S, K, T, r, sigma, option_type):
     10.4506
     """
     option_type = normalise_option_type(option_type)
-    _validate(S, K, T, sigma, option_type)
+    check_inputs(S, K, T, sigma, option_type)
 
     pv_K = K * math.exp(-r * T)
 
