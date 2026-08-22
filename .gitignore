@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Tests / tooling
+.pytest_cache/
+.ruff_cache/
+
+# Market data snapshots.
+# One small sample snapshot is committed on purpose (see data/snapshots/README.md)
+# so the notebooks run without an IBKR connection. Everything else is local noise.
+data/snapshots/*.csv
+!data/snapshots/sample_*.csv
+
+# Generated figures, except the ones the README links to
+figures/
+!figures/surface.png
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local working documents, deliberately not published.
+CLAUDE.md
+docs/PLAN.md
