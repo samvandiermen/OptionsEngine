@@ -11,7 +11,7 @@ import math
 import pytest
 from scipy.optimize import brentq
 from optionsengine.pricing import bs_price
-from optionsengine.implied_vol import SIGMA_BOUNDS, implied_volatility
+from optionsengine.implied_vol import SIGMA_BOUNDS, implied_vol
 
 R = 0.03
 
@@ -41,7 +41,7 @@ def test_round_trip_recovers_the_volatility(S, K, T, sigma, option_type):
     volatility. Near the money vega is healthy, so what is left is tiny.
     """
     price = bs_price(S, K, T, R, sigma, option_type)
-    result = implied_volatility(price, S, K, T, R, option_type)
+    result = implied_vol(price, S, K, T, R, option_type)
 
     assert result.method != "failed", result.reason
     assert result.iv == pytest.approx(sigma, abs=1e-6)
@@ -50,7 +50,7 @@ def test_round_trip_recovers_the_volatility(S, K, T, sigma, option_type):
 def test_newton_solves_ordinary_options_quickly():
     """Newton converges fast, which is the whole reason it goes first."""
     price = bs_price(100.0, 105.0, 0.5, R, 0.25, "call")
-    result = implied_volatility(price, 100.0, 105.0, 0.5, R, "call")
+    result = implied_vol(price, 100.0, 105.0, 0.5, R, "call")
 
     assert result.method == "newton"
     assert result.iterations <= 6
@@ -72,7 +72,7 @@ def test_bisection_takes_over_and_still_gets_it_right(S, K, T, sigma, option_typ
     range it already knows contains the answer.
     """
     price = bs_price(S, K, T, R, sigma, option_type)
-    result = implied_volatility(price, S, K, T, R, option_type)
+    result = implied_vol(price, S, K, T, R, option_type)
 
     assert result.method == "bisection"
     assert result.iv == pytest.approx(sigma, abs=1e-4)
@@ -92,14 +92,14 @@ def test_agrees_with_an_independent_solver(option_type):
         *SIGMA_BOUNDS,
         xtol=1e-12,
     )
-    result = implied_volatility(price, S, K, T, R, option_type)
+    result = implied_vol(price, S, K, T, R, option_type)
     assert result.iv == pytest.approx(expected, abs=1e-6)
 
 
 @pytest.mark.parametrize("price", [0.0, -1.0, float("nan"), float("inf")])
 def test_unusable_prices_fail_without_raising(price):
     """A missing or nonsense quote is data to filter out, not a crash."""
-    result = implied_volatility(price, 100.0, 100.0, 0.5, R, "call")
+    result = implied_vol(price, 100.0, 100.0, 0.5, R, "call")
 
     assert result.method == "failed"
     assert math.isnan(result.iv)
@@ -109,14 +109,14 @@ def test_unusable_prices_fail_without_raising(price):
 def test_price_below_the_no_arbitrage_minimum_fails():
     """No volatility can produce a price under the floor, so do not pretend."""
     floor = max(100.0 - 90.0 * math.exp(-R * 0.5), 0.0)
-    result = implied_volatility(floor - 1.0, 100.0, 90.0, 0.5, R, "call")
+    result = implied_vol(floor - 1.0, 100.0, 90.0, 0.5, R, "call")
 
     assert result.method == "failed"
     assert "no-arbitrage" in result.reason
 
 
 def test_price_above_the_search_range_fails():
-    result = implied_volatility(99.9, 100.0, 100.0, 0.5, R, "call")
+    result = implied_vol(99.9, 100.0, 100.0, 0.5, R, "call")
 
     assert result.method == "failed"
     assert math.isnan(result.iv)
@@ -135,7 +135,7 @@ def test_deep_in_the_money_near_expiry_has_no_answer(S, K, T, option_type):
     anything. Reporting a number here would be the worst outcome: it would look
     like a real data point on the surface."""
     price = bs_price(S, K, T, R, 0.20, option_type)
-    result = implied_volatility(price, S, K, T, R, option_type)
+    result = implied_vol(price, S, K, T, R, option_type)
 
     assert result.method == "failed"
     assert math.isnan(result.iv)
@@ -151,7 +151,7 @@ def test_far_out_of_the_money_near_expiry_has_no_answer():
     """
     S, K, T, sigma = 100.0, 110.0, 7 / 365, 0.10
     price = bs_price(S, K, T, R, sigma, "call")
-    result = implied_volatility(price, S, K, T, R, "call")
+    result = implied_vol(price, S, K, T, R, "call")
 
     assert result.method == "failed"
     assert "barely moves" in result.reason
@@ -169,11 +169,11 @@ def test_far_out_of_the_money_near_expiry_has_no_answer():
 def test_bad_contract_details_raise(kwargs):
     """These come from our own code, not from the market, so they are bugs."""
     with pytest.raises(ValueError):
-        implied_volatility(5.0, r=R, option_type="call", **kwargs)
+        implied_vol(5.0, r=R, option_type="call", **kwargs)
 
 
 def test_successful_result_is_a_plain_float():
-    result = implied_volatility(10.0, 100.0, 100.0, 1.0, R, "call")
+    result = implied_vol(10.0, 100.0, 100.0, 1.0, R, "call")
 
     assert result.method == "newton"
     assert type(result.iv) is float

@@ -12,7 +12,7 @@ tested against published values in test_pricing.py.
 
 import pytest
 from optionsengine.pricing import bs_price
-from optionsengine.greeks import delta, gamma, rho, theta, vega
+from optionsengine.greeks import all_greeks, delta, gamma, rho, theta, vega
 
 # A spread of situations: at the money, either side of the money, close to
 # expiry, and index-sized numbers where the absolute values look very different.
@@ -164,6 +164,19 @@ def test_greeks_refuse_zero_time_or_zero_volatility(bad):
         delta(args["S"], args["K"], args["T"], args["r"], args["sigma"], "call")
     with pytest.raises(ValueError):
         gamma(args["S"], args["K"], args["T"], args["r"], args["sigma"])
+
+
+@pytest.mark.parametrize("case", CASES)
+@pytest.mark.parametrize("option_type", RIGHTS)
+def test_all_greeks_matches_the_individual_functions(case, option_type):
+    S, K, T, r, sigma = case["S"], case["K"], case["T"], case["r"], case["sigma"]
+
+    g = all_greeks(S, K, T, r, sigma, option_type)
+    assert g.delta == delta(S, K, T, r, sigma, option_type)
+    assert g.gamma == gamma(S, K, T, r, sigma)
+    assert g.vega == vega(S, K, T, r, sigma)
+    assert g.theta == theta(S, K, T, r, sigma, option_type)
+    assert g.rho == rho(S, K, T, r, sigma, option_type)
 
 
 def test_greeks_return_plain_floats():

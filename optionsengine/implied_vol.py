@@ -116,7 +116,7 @@ def _bisection(price, S, K, T, r, option_type):
     return 0.5 * (lo + hi), MAX_BISECTION
 
 
-def implied_volatility(price, S, K, T, r, option_type):
+def implied_vol(price, S, K, T, r, option_type):
     """Solve for Black-Scholes implied volatility given a market price.
     
     Tries Newton-Raphson first (fast, quadratic convergence); falls back
@@ -141,7 +141,7 @@ def implied_volatility(price, S, K, T, r, option_type):
     --------
     >>> from optionsengine.pricing import bs_price
     >>> market = bs_price(100, 105, 0.5, 0.03, 0.28, "call")
-    >>> result = implied_volatility(market, 100, 105, 0.5, 0.03, "call")
+    >>> result = implied_vol(market, 100, 105, 0.5, 0.03, "call")
     >>> round(result.iv, 6)
     0.28
     """

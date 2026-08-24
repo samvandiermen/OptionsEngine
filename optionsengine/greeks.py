@@ -22,6 +22,20 @@ from scipy.stats import norm
 from optionsengine.pricing import CALL, check_inputs, d1_d2, normalise_option_type
 
 
+class Greeks:
+    """All five Greeks for one option, bundled together.
+
+    delta, gamma, vega, theta, rho -- see each function above for what it means.
+    """
+
+    def __init__(self, delta, gamma, vega, theta, rho):
+        self.delta = delta
+        self.gamma = gamma
+        self.vega = vega
+        self.theta = theta
+        self.rho = rho
+
+
 def _check(S, K, T, sigma, option_type=None):
     """Same checks as the pricer, plus T and sigma strictly above zero.
 
@@ -118,3 +132,19 @@ def rho(S, K, T, r, sigma, option_type):
     if option_type == CALL:
         return float(pv_K * T * norm.cdf(d2))
     return float(-pv_K * T * norm.cdf(-d2))
+
+
+def all_greeks(S, K, T, r, sigma, option_type):
+    """Compute all five Greeks for one option in one call.
+
+    A thin wrapper around the five functions above -- for when every
+    sensitivity is needed for the same option, instead of calling each on its
+    own and repeating the same S, K, T, r, sigma five times.
+    """
+    return Greeks(
+        delta=delta(S, K, T, r, sigma, option_type),
+        gamma=gamma(S, K, T, r, sigma),
+        vega=vega(S, K, T, r, sigma),
+        theta=theta(S, K, T, r, sigma, option_type),
+        rho=rho(S, K, T, r, sigma, option_type),
+    )
