@@ -6,12 +6,13 @@ derivatives of the price function defined here, and the implied volatility
 solver (implied_vol.py) runs this function backwards to find the volatility
 that reproduces an observed market price.
 
-Assumptions baked into these formulas (see README for the full discussion):
-  - European exercise (can only be exercised at expiry)
-  - No dividends
-  - Constant risk-free rate r
-  - Constant volatility sigma
-  - Frictionless markets, lognormal returns
+Model assumptions (see README for full discussion):
+    - The underlying follows geometric Brownian motion with constant
+      volatility and constant risk-free rate.
+    - No dividends are paid over the life of the option.
+    - Options are European-style (exercisable only at expiry).
+    - Markets are frictionless (no transaction costs, unlimited
+      borrowing/lending at the risk-free rate, no arbitrage).
 
 These functions price one option at a time. Handling many at once would run
 faster, but we only ever price a few hundred, so readable formulas win.
@@ -58,16 +59,27 @@ def normalise_option_type(option_type):
 
 
 def d1_d2(S, K, T, r, sigma):
-    """The two intermediate terms in the Black-Scholes formula.
+    """Compute the d1 and d2 terms of the Black-Scholes formula.
 
         d1 = [ln(S/K) + (r + sigma^2 / 2) * T] / (sigma * sqrt(T))
         d2 = d1 - sigma * sqrt(T)
 
     Needs T and sigma above zero. bs_price handles those cases before calling this.
+
+    Parameters
+    ----------
+    S : spot price of the underlying
+    K : strike price
+    T : time to expiry, in years
+    r : continuously-compounded risk-free rate (annualized)
+    sigma : annualized volatility of the underlying's returns
+
+    Returns
+    -------
+    float
     """
-    sigma_sqrt_T = sigma * math.sqrt(T)
-    d1 = (math.log(S / K) + (r + 0.5 * sigma**2) * T) / sigma_sqrt_T
-    d2 = d1 - sigma_sqrt_T
+    d1 = (math.log(S / K) + T * (r + sigma**2 / 2)) / (sigma * math.sqrt(T))
+    d2 = d1 - (sigma * math.sqrt(T))
     return d1, d2
 
 

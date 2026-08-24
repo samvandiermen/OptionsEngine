@@ -8,7 +8,7 @@ is trustworthy enough to build the Greeks and the IV solver on top of it.
 
 import math
 import pytest
-from optionsengine.black_scholes import bs_price, forward_price
+from optionsengine.pricing import bs_price, forward_price
 
 # Hull, "Options, Futures and Other Derivatives" worked example:
 # spot 42, strike 40, 6 months to expiry, 10% rate, 20% vol.

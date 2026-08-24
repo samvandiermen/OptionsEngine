@@ -10,8 +10,8 @@ solved at all, and whether the answer matches an independent solver.
 import math
 import pytest
 from scipy.optimize import brentq
-from optionsengine.black_scholes import bs_price
-from optionsengine.implied_vol import SIGMA_MAX, SIGMA_MIN, implied_volatility
+from optionsengine.pricing import bs_price
+from optionsengine.implied_vol import SIGMA_BOUNDS, implied_volatility
 
 R = 0.03
 
@@ -89,8 +89,7 @@ def test_agrees_with_an_independent_solver(option_type):
 
     expected = brentq(
         lambda v: bs_price(S, K, T, R, v, option_type) - price,
-        SIGMA_MIN,
-        SIGMA_MAX,
+        *SIGMA_BOUNDS,
         xtol=1e-12,
     )
     result = implied_volatility(price, S, K, T, R, option_type)

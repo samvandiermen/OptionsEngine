@@ -1,4 +1,4 @@
-"""The five Greeks, in closed form.
+"""Closed-form Black-Scholes Greeks for European options.
 
 Each one measures how the option price responds to a change in one input:
 
@@ -19,7 +19,7 @@ curvature and the volatility sensitivity have to match.
 
 import math
 from scipy.stats import norm
-from optionsengine.black_scholes import CALL, check_inputs, d1_d2, normalise_option_type
+from optionsengine.pricing import CALL, check_inputs, d1_d2, normalise_option_type
 
 
 def _check(S, K, T, sigma, option_type=None):
@@ -52,7 +52,6 @@ def delta(S, K, T, r, sigma, option_type):
         return float(norm.cdf(d1))
     return float(norm.cdf(d1) - 1.0)
 
-
 def gamma(S, K, T, r, sigma):
     """Change in delta per 1.00 change in the underlying.
 
@@ -73,9 +72,6 @@ def vega(S, K, T, r, sigma):
 
     Always positive. Divide by 100 for the change per 1% of volatility, which
     is how it is usually quoted.
-
-    This is the number the implied volatility solver divides by, so where vega
-    is near zero Newton-Raphson becomes unreliable and bisection takes over.
     """
     _check(S, K, T, sigma)
 
@@ -91,9 +87,6 @@ def theta(S, K, T, r, sigma, option_type):
 
     Usually negative: an option loses value as expiry approaches. Divide by
     365 for the change per calendar day.
-
-    Note the sign convention. Theta is the derivative with respect to time
-    passing, which is minus the derivative with respect to time remaining.
     """
     option_type = normalise_option_type(option_type)
     _check(S, K, T, sigma, option_type)
@@ -120,8 +113,8 @@ def rho(S, K, T, r, sigma, option_type):
     _check(S, K, T, sigma, option_type)
 
     _, d2 = d1_d2(S, K, T, r, sigma)
-    pv_K_times_T = K * T * math.exp(-r * T)
+    pv_K = K * math.exp(-r * T)
 
     if option_type == CALL:
-        return float(pv_K_times_T * norm.cdf(d2))
-    return float(-pv_K_times_T * norm.cdf(-d2))
+        return float(pv_K * T * norm.cdf(d2))
+    return float(-pv_K * T * norm.cdf(-d2))

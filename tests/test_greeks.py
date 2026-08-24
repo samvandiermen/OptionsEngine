@@ -7,11 +7,11 @@ These tests compute both and check they agree.
 That makes it an independent check. The formulas are easy to get subtly wrong --
 a sign in theta, a missing exp(-rT) in rho -- and re-deriving them by hand
 repeats the same error-prone work. The bump only uses bs_price, which is already
-tested against published values in test_black_scholes.py.
+tested against published values in test_pricing.py.
 """
 
 import pytest
-from optionsengine.black_scholes import bs_price
+from optionsengine.pricing import bs_price
 from optionsengine.greeks import delta, gamma, rho, theta, vega
 
 # A spread of situations: at the money, either side of the money, close to
