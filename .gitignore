@@ -14,9 +14,14 @@ venv/
 
 # Market data snapshots.
 # One small sample snapshot is committed on purpose (see data/snapshots/README.md)
-# so the notebooks run without an IBKR connection. Everything else is local noise.
+# so the notebooks run with no live pull needed. Everything else is local noise.
 data/snapshots/*.csv
 !data/snapshots/sample_*.csv
+
+# Diagnostic scripts: scratch work to verify an API by hand, not part of the
+# public repo. Findings from running them belong in CLAUDE.md, not in git.
+scripts/test_yfinance.py
+scripts/peek_chain.py
 
 # Generated figures, except the ones the README links to
 figures/

@@ -47,8 +47,8 @@ def check_inputs(S, K, T, sigma, option_type=None):
 def normalise_option_type(option_type):
     """Turn any spelling of call or put into one standard form.
 
-    IBKR writes 'C' and 'P', people write 'call' and 'put'. Accept both, in
-    any capitalisation.
+    Some callers write 'C' and 'P', others write 'call' and 'put'. Accept
+    both, in any capitalisation.
     """
     text = str(option_type).strip().lower()
     if text in ("c", "call"):

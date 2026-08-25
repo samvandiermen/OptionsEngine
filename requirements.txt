@@ -8,9 +8,8 @@ pandas>=2.2
 plotly>=6.0
 kaleido>=0.2
 
-# Interactive Brokers API client.
-# ib_async is the maintained community successor to ib_insync.
-ib_async>=2.0
+# Live market data.
+yfinance>=1.5
 
 # Notebooks
 ipykernel>=6.29

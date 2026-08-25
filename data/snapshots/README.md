@@ -7,6 +7,6 @@ They are written by `scripts/fetch_snapshot.py`. Which index it fetches is set i
 `config.py`, and the file name records it.
 
 Files named `sample_*.csv` are committed to git, so the notebooks run for someone with no
-IBKR account. Everything else stays on your machine.
+internet access at all. Everything else stays on your machine.
 
-The prices are delayed by about 15 minutes.
+The prices are delayed by 15 minutes.

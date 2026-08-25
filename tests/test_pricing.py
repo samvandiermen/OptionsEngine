@@ -107,8 +107,8 @@ def test_price_stays_within_no_arbitrage_bounds():
         assert lower <= call <= S
 
 
-def test_accepts_ibkr_style_option_rights():
-    """IBKR reports the option right as 'C' or 'P', so the pricer accepts both."""
+def test_accepts_single_letter_option_rights():
+    """Market data sources often report the option right as 'C' or 'P', so the pricer accepts both."""
     call_long = bs_price(100.0, 100.0, 1.0, 0.03, 0.2, "call")
     call_short = bs_price(100.0, 100.0, 1.0, 0.03, 0.2, "C")
     assert call_long == call_short
