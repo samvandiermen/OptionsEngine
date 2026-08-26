@@ -1,10 +1,9 @@
-"""CLI: pull one option chain snapshot for the active index and write it to
+"""CLI: pull one option chain snapshot for the active underlying and write it to
 data/snapshots/, named from the moment the data is actually from (asof).
 """
 import os
 import sys
 import time
-from zoneinfo import ZoneInfo
 
 # Add the repo root to sys.path so optionsengine can be imported.
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,7 +18,7 @@ moneyness_min, moneyness_max = config.MONEYNESS_BOUNDS
 start = time.time()
 
 df = fetch_snapshot(
-    index_config=config.ACTIVE,
+    underlying=config.ACTIVE,
     r=config.r,
     min_years=min_years,
     max_years=max_years,
@@ -30,9 +29,8 @@ df = fetch_snapshot(
 
 elapsed = time.time() - start
 
-asof = df["asof"].iloc[0]  # UTC, used as-is everywhere except the filename below
-local_asof = asof.astimezone(ZoneInfo("Europe/Amsterdam"))
-filename = f"{config.ACTIVE_SYMBOL.lower()}_{local_asof:%Y%m%d_%H%M}.csv"
+asof = df["asof"].iloc[0]  # exchange time (ET for SPX), from snapshot.py
+filename = f"{config.ACTIVE_SYMBOL.lower()}_{asof:%Y%m%d_%H%M}.csv"
 path = os.path.join(REPO_ROOT, "data", "snapshots", filename)
 df.to_csv(path, index=False)
 
