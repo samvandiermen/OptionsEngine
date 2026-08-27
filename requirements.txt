@@ -3,10 +3,13 @@ numpy>=2.0
 scipy>=1.13
 pandas>=2.2
 
-# Plotting (kaleido is needed to export static PNGs for the README,
-# because GitHub does not render interactive Plotly output in notebooks)
+# Plotting. plotly draws the interactive IV surface (plotting.py); kaleido exports
+# it as a static PNG for the README, because GitHub does not render interactive
+# Plotly output in notebooks. matplotlib draws the simple 2D notebook charts, since
+# those just need to show up as a plain image with no extra dependency.
 plotly>=6.0
 kaleido>=0.2
+matplotlib>=3.9
 
 # Live market data.
 yfinance>=1.5

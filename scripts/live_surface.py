@@ -39,14 +39,10 @@ while True:
                             config.AM_SETTLEMENT_HOUR, config.PM_SETTLEMENT_HOUR, config.r)
     solved = add_our_iv(cleaned, config.r)
     solved = add_log_moneyness(solved)
-    surface = build_surface(solved, iv_column="iv_ours")
 
+    surface = build_surface(solved, iv_column="iv_ours")
     fig = plot_surface(surface, title=f"{config.ACTIVE_SYMBOL} Implied Volatility Surface")
     fig.write_html(OUTPUT_PATH)
-
-    surface_y = build_surface(solved, iv_column="implied_vol_yahoo")
-    fig_y = plot_surface(surface_y, title=f"{config.ACTIVE_SYMBOL} Yahoo Implied Volatility Surface")
-    fig_y.write_html(OUTPUT_PATH.replace(".html", "_yahoo.html"))
 
     elapsed = time.time() - start
     print(f"Refreshed {OUTPUT_PATH} ({len(solved)} quotes) in {elapsed:.1f}s", flush=True)

@@ -23,9 +23,12 @@ data/snapshots/*.csv
 scripts/test_yfinance.py
 scripts/peek_chain.py
 
-# Generated figures, except the ones the README links to
-figures/
+# Generated figures, except the ones the README links to.
+# Must be figures/* not figures/. Git won't check a negation for a file inside
+# a directory that's ignored outright, it never descends into it to look.
+figures/*
 !figures/surface.png
+!figures/sample_surface.html
 
 # OS
 .DS_Store
