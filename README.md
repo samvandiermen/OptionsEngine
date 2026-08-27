@@ -7,7 +7,7 @@ volatility surface.
 The formula itself isn't the point. Black-Scholes is in every textbook and every
 finance library already. What this project is actually about is the stuff that's
 easy to get subtly wrong: a solver that tells you when it can't find an answer
-instead of returning a wrong one, real quote hygiene on live market data, the
+instead of returning a wrong one, cleaning real market quotes properly, the
 correct time-to-expiry convention, and being honest about where the model breaks
 down.
 
@@ -95,6 +95,8 @@ with `yfinance`. No account or brokerage connection needed.
 - Time to expiry is measured in hours, from the quote's own moment to the
   contract's real settlement time. Not whole days, and not the wall clock.
 
+See [notebooks/03_live_surface.ipynb](notebooks/03_live_surface.ipynb).
+
 ## The surface
 
 Each expiry's own smile is interpolated separately: log-moneyness `ln(K/F)` against
@@ -180,7 +182,7 @@ Built and tested with Python 3.14, numpy, scipy, pandas, plotly, and yfinance.
 | `optionsengine/implied_vol.py` | Newton-Raphson with a bisection fallback |
 | `optionsengine/config.py` | Symbol, rate, chain window, per-underlying settings |
 | `optionsengine/yahoo/` | The only code that imports yfinance |
-| `optionsengine/quotes.py` | Mid price, bad-quote hygiene, OTM selection |
+| `optionsengine/quotes.py` | Mid price, dropping bad quotes, OTM selection |
 | `optionsengine/validation.py` | Our IV vs Yahoo's, error by bucket and method |
 | `optionsengine/surface.py` | Per-expiry smile interpolation into a surface grid |
 | `optionsengine/plotting.py` | The 3D surface, individual smiles, term structure |
