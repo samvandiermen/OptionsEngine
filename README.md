@@ -4,13 +4,6 @@ A Black-Scholes options pricer, Greeks, and implied volatility solver, built fro
 scratch and run against a live SPX option chain to produce an actual implied
 volatility surface.
 
-The formula itself isn't the point. Black-Scholes is in every textbook and every
-finance library already. What this project is actually about is the stuff that's
-easy to get subtly wrong: a solver that tells you when it can't find an answer
-instead of returning a wrong one, cleaning real market quotes properly, the
-correct time-to-expiry convention, and being honest about where the model breaks
-down.
-
 ## Architecture
 
 ```mermaid
