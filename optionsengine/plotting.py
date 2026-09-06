@@ -33,6 +33,9 @@ def plot_surface(surface, title="Implied Volatility Surface"):
     ))
     fig.update_layout(
         title=title,
+        width=900,
+        height=650,
+        margin=dict(l=0, r=0, t=50, b=10),
         scene=dict(
             xaxis_title="log-moneyness ln(K/F)",
             yaxis_title="years to expiry",
@@ -41,6 +44,7 @@ def plot_surface(surface, title="Implied Volatility Surface"):
             yaxis=dict(dtick=0.1),
             zaxis=dict(range=[z_min, z_max], dtick=0.05),
             aspectmode="cube",  # equal visual proportions, not scaled to raw data ranges
+            camera=dict(eye=dict(x=1.5, y=1.5, z=1.0)),
         ),
     )
     return fig

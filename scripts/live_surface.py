@@ -42,6 +42,7 @@ while True:
 
     surface = build_surface(solved, iv_column="iv_ours")
     fig = plot_surface(surface, title=f"{config.ACTIVE_SYMBOL} Implied Volatility Surface")
+    fig.update_layout(width=None, height=None)  # let the browser size the interactive view
     fig.write_html(OUTPUT_PATH)
 
     elapsed = time.time() - start
