@@ -204,10 +204,10 @@ Here is where it does not match reality, and which way the error goes.
   both strike and expiry.
 - **Constant risk-free rate.** The rate is set once in the config file at 4%, not
   pulled from live data.
-- **No dividends.** SPX pays a dividend yield of roughly 1.2 to 1.4% a year, and the
-  model ignores it. The effect is small but systematic: modelled call prices come
-  out slightly low and put prices slightly high. SPX was chosen partly because it
-  has the lowest dividend yield of the obvious index candidates, so this shortcut is
+- **No dividends.** SPX pays a dividend yield of around 1% a year, and the model
+  ignores it. The effect is small but systematic: modelled call prices come out
+  slightly low and put prices slightly high. SPX was chosen partly because it has
+  the lowest dividend yield of the obvious index candidates, so this shortcut is
   cheapest here.
 - **European exercise.** The model assumes the option can only be exercised at
   expiry. This is true for SPX, which is why it was chosen over SPY.
