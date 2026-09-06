@@ -30,6 +30,19 @@ def test_add_years_to_expiry_uses_the_right_settlement_per_row():
     assert result["years_to_expiry"].iloc[1] == pytest.approx(expected_monthly)
 
 
+def test_add_years_to_expiry_raises_on_an_unparseable_symbol():
+    """A contract symbol we cannot read the root from is a clear error, not a
+    silent crash deeper in."""
+    quotes = pd.DataFrame({
+        "contract_symbol": ["not-a-real-symbol"],
+        "expiry": ["2026-09-01"],
+        "asof": [ASOF],
+    })
+    with pytest.raises(ValueError):
+        add_years_to_expiry(quotes, weekly_root="SPXW", monthly_root="SPX",
+                             am_hour=9.5, pm_hour=16.0)
+
+
 def test_add_forward_matches_forward_price():
     quotes = pd.DataFrame({"underlying_price": [100.0], "years_to_expiry": [0.5]})
     result = add_forward(quotes, r=0.04)
@@ -62,14 +75,14 @@ def test_select_otm_keeps_calls_above_and_puts_below_forward():
     assert set(result.index) == {0, 2}
 
 
-def test_select_otm_boundary_is_inclusive():
+def test_select_otm_keeps_a_strike_on_the_forward_once_as_a_call():
     quotes = pd.DataFrame({
         "right": ["C", "P"],
         "strike": [100.0, 100.0],
         "forward": [100.0, 100.0],
     })
     result = select_otm(quotes)
-    assert len(result) == 2
+    assert list(result.index) == [0]  # the call is kept, the put at the same strike is dropped
 
 
 def test_clean_quotes_runs_the_full_pipeline():

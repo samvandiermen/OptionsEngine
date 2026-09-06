@@ -185,7 +185,7 @@ IV: [notebooks/03_live_surface.ipynb](notebooks/03_live_surface.ipynb).
 
 | Check | Result |
 |---|---|
-| Test suite | 715 tests pass, no network needed |
+| Test suite | 716 tests pass, no network needed |
 | Textbook cross-check | Matches Hull's worked example: call 4.76, put 0.81 |
 | Put-call parity | Holds to within 1e-6 across the pricer and all five Greeks |
 | Solver split | 98% Newton, 2% bisection on the committed sample snapshot |
@@ -239,7 +239,7 @@ git clone https://github.com/samvandiermen/OptionsEngine
 cd OptionsEngine
 pip install -r requirements.txt
 
-python -m pytest tests/ -q            # 715 tests, no network needed
+python -m pytest tests/ -q            # 716 tests, no network needed
 
 jupyter lab notebooks/                # walkthrough, runs from the committed sample
 
@@ -264,6 +264,6 @@ Built and tested with Python 3.14, numpy, scipy, pandas, plotly, and yfinance.
 | `optionsengine/plotting.py` | The 3D surface, individual smiles, term structure |
 | `scripts/` | CLI entry points: fetch a snapshot, run the live view |
 | `notebooks/` | Pricer and Greeks, solver behaviour, the live surface |
-| `tests/` | 715 tests, synthetic data only, no network |
+| `tests/` | 716 tests, synthetic data only, no network |
 
 ---

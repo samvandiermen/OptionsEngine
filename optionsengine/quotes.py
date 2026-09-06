@@ -17,8 +17,10 @@ MAX_SPREAD_FRACTION = 0.5
 def add_years_to_expiry(quotes, weekly_root, monthly_root, am_hour, pm_hour):
     """Add a years_to_expiry column, using each row's own settlement time."""
     def _years(row):
-        root = ROOT_PATTERN.match(row["contract_symbol"]).group(1)
-        hour = resolve_settlement_hour(root, weekly_root, monthly_root, am_hour, pm_hour)
+        match = ROOT_PATTERN.match(row["contract_symbol"])
+        if match is None:
+            raise ValueError(f"Cannot read the root from contract symbol {row['contract_symbol']!r}")
+        hour = resolve_settlement_hour(match.group(1), weekly_root, monthly_root, am_hour, pm_hour)
         return years_to_expiry(row["asof"], row["expiry"], hour)
 
     quotes = quotes.copy()
@@ -53,9 +55,11 @@ def drop_bad_quotes(quotes, max_spread_fraction=MAX_SPREAD_FRACTION):
 
 
 def select_otm(quotes):
-    """Keep calls at or above the forward, puts at or below. Needs forward already added."""
+    """Keep out-of-the-money options: calls at or above the forward, puts strictly below.
+    A strike sitting exactly on the forward counts as the call, so it is kept once, not
+    twice. Needs forward already added."""
     calls = quotes[(quotes["right"] == "C") & (quotes["strike"] >= quotes["forward"])]
-    puts = quotes[(quotes["right"] == "P") & (quotes["strike"] <= quotes["forward"])]
+    puts = quotes[(quotes["right"] == "P") & (quotes["strike"] < quotes["forward"])]
     return pd.concat([calls, puts])
 
 
