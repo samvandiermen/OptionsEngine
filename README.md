@@ -100,10 +100,12 @@ long as the answer really is inside the starting range.
 
 A few things make it more reliable than a naive loop:
 
-- **The starting guess is calculated, not hard-coded.** It uses the
-  Brenner-Subrahmanyam approximation, which is exact at the money and roughly right
-  elsewhere. That is good enough for a starting point and better than always
-  starting from 0.20.
+- **The starting guess is a flat 20%.** The Brenner-Subrahmanyam formula was the
+  other option. It approximates the volatility fairly well when the strike is
+  close to the spot price, but it loses accuracy quickly as the strike moves away
+  from it, and most of the chain is away from the money. A fixed 20% is simpler,
+  and it starts Newton where vega is large enough for the first step to behave, so
+  it falls back to bisection less often.
 - **The range is checked before solving.** Price rises with volatility, so if the
   market price is below the price at 0.01% vol or above the price at 500% vol, no
   volatility fits and the solver returns a failed result with the reason, rather
@@ -113,11 +115,11 @@ A few things make it more reliable than a naive loop:
   and whichever one the solver landed on is not meaningful. When that happens the
   result is marked failed instead.
 
-Every result also records which method solved it. That is what makes it possible to
-report how often the fallback was needed. On the committed sample snapshot the split
-is **54% Newton, 46% bisection**. The bisection cases are the options with little
-time left and strikes far from the money, which is exactly where vega gets small and
-Newton struggles.
+Every result also records which method solved it, so we can report how often the
+fallback was needed. On the committed sample snapshot the split is **98% Newton,
+2% bisection**. The few bisection cases are options with almost no time left and
+strikes far from the money, where vega is so small that Newton's step overshoots the
+search range.
 
 The numbers and the reasoning: [notebooks/02_iv_solver.ipynb](notebooks/02_iv_solver.ipynb).
 
@@ -184,7 +186,7 @@ IV: [notebooks/03_live_surface.ipynb](notebooks/03_live_surface.ipynb).
 | Test suite | 715 tests pass, no network needed |
 | Textbook cross-check | Matches Hull's worked example: call 4.76, put 0.81 |
 | Put-call parity | Holds to within 1e-6 across the pricer and all five Greeks |
-| Solver split | 54% Newton, 46% bisection on the committed sample snapshot |
+| Solver split | 98% Newton, 2% bisection on the committed sample snapshot |
 | Solved IV vs Yahoo's IV | MAE 0.0155, RMSE 0.0185 (see the note in Limitations) |
 
 Put-call parity is the main correctness check. It comes from a no-arbitrage

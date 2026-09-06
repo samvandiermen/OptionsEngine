@@ -3,6 +3,10 @@
 # Risk-free rate, constant, not fetched live.
 r = 0.04
 
+# Starting volatility for the implied vol solver. A flat 20%, not a formula.
+# See _newton in implied_vol.py for why.
+IV_INITIAL_GUESS = 0.20
+
 # Which underlying is active. Change this to switch underlying.
 ACTIVE_SYMBOL = "SPX"
 

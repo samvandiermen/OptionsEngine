@@ -14,6 +14,7 @@ often the fallback was needed and see where those quotes sit on the surface.
 """
 
 import math
+from optionsengine.config import IV_INITIAL_GUESS
 from optionsengine.pricing import bs_price, check_inputs, normalise_option_type
 from optionsengine.greeks import vega
 
@@ -52,26 +53,19 @@ def _failed(reason, iterations=0):
     return IVResult(float("nan"), "failed", iterations, reason)
 
 
-def _initial_guess(price, S, T):
-    """Brenner-Subrahmanyam: sigma is roughly sqrt(2*pi/T) * price / S.
+def _newton(price, S, K, T, r, option_type):
+    """Try to solve for implied vol with Newton-Raphson.
 
-    Exact for an at-the-money option and rough everywhere else, which is all we
-    need from a starting point. Better than hard-coding 0.20.
+    Every quote starts at a flat 20% (config.IV_INITIAL_GUESS). We tried the
+    Brenner-Subrahmanyam guess first. It is close near the money but loses
+    accuracy fast for strikes away from it, which is most of the chain.
+    Starting at 20% is simpler and puts Newton where vega is big enough for the
+    first step to behave.
 
-    Minimum sigma is 5%. Starting any lower puts vega near zero too, so
-    Newton's first step is unreliable and it gives up immediately, falling
-    back to bisection even when the real answer was easy to reach.
+    Returns (sigma, iterations) if it worked, or (None, iterations) if Newton
+    gave up and bisection needs to take over.
     """
-    guess = math.sqrt(2 * math.pi / T) * price / S
-    return min(max(guess, 0.05), SIGMA_BOUNDS[1])
-
-
-def _newton(price, S, K, T, r, option_type, guess):
-    """Attempt Newton-Raphson iteration.
-    Returns (sigma, iterations) if it worked, or (None, iterations) if it gave
-    up, in which case bisection takes over.
-    """
-    sigma = guess
+    sigma = IV_INITIAL_GUESS
 
     for i in range(1, MAX_NEWTON + 1):
         gap = bs_price(S, K, T, r, sigma, option_type) - price
@@ -163,8 +157,7 @@ def implied_vol(price, S, K, T, r, option_type):
     if price > high_price:
         return _failed(f"price implies volatility above {SIGMA_BOUNDS[1]:.0%}")
 
-    guess = _initial_guess(price, S, T)
-    sigma, iterations = _newton(price, S, K, T, r, option_type, guess)
+    sigma, iterations = _newton(price, S, K, T, r, option_type)
     method = "newton"
 
     if sigma is None:
