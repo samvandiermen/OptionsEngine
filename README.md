@@ -1,5 +1,7 @@
 # OptionsEngine and Implied Volatility Surface
 
+[![tests](https://github.com/samvandiermen/OptionsEngine/actions/workflows/tests.yml/badge.svg)](https://github.com/samvandiermen/OptionsEngine/actions/workflows/tests.yml)
+
 This project uses the Black-Scholes formula to price options, calculate the Greeks,
 and solve for implied volatility. Everything is written from scratch. It pulls live
 SPX option data from Yahoo Finance (through the `yfinance` package) and uses it to
