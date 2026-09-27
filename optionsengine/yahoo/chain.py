@@ -1,10 +1,10 @@
 """
 Which expiries and strikes are worth asking yfinance for.
 
-Three pure functions, no network calls. snapshot.py does the actual fetching
-and calls these to decide what to keep. Kept separate from quotes.py: this file
-controls what we request/keep at all, quotes.py later decides what to trust as
-a fair price once there's real bid/ask to judge by.
+Three pure functions, no network calls. snapshot.py does the fetching and calls
+these to decide what to keep. This is kept separate from quotes.py on purpose.
+This file controls what we request and keep at all. quotes.py later decides
+what to trust as a fair price, once there is real bid/ask to judge by.
 """
 import datetime
 from optionsengine.pricing import forward_price
@@ -13,9 +13,9 @@ from optionsengine.pricing import forward_price
 def select_expiries(available_expiries, asof, min_years, max_years):
     """Keep expiries whose time to expiry, counted from asof, falls in [min_years, max_years].
 
-    Uses a rough whole-day count, not the precise ACT/365 AM/PM-settlement
-    convention time_utils.py applies for pricing. Deciding which bucket an
-    expiry falls into doesn't need that precision, only IV solving does.
+    Uses a rough whole-day count, not the precise ACT/365 AM/PM settlement
+    convention that time_utils.py uses for pricing. Deciding whether an expiry
+    is in the window does not need that precision. Only the IV solving does.
     """
     selected = []
     for expiry in available_expiries:
@@ -42,8 +42,8 @@ def select_root(contracts, weekly_root, monthly_root):
 def select_moneyness(contracts, spot, r, years, moneyness_min, moneyness_max):
     """Keep strikes within [moneyness_min, moneyness_max] of the forward price.
 
-    Bounds how far from the money we bother keeping, not which side is OTM.
-    That split is quotes.py's job, once we actually have bid/ask to judge by.
+    This only bounds how far from the money we keep strikes, not which side is
+    OTM. That split is quotes.py's job, once we have bid/ask to judge by.
     """
     forward = forward_price(spot, years, r)
     lo, hi = moneyness_min * forward, moneyness_max * forward

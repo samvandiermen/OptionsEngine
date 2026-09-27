@@ -1,5 +1,6 @@
-"""CLI: pull one option chain snapshot for the active underlying and write it to
-data/snapshots/, named from the moment the data is actually from (asof).
+"""Command line tool. Pull one option chain snapshot for the active underlying and
+write it to data/snapshots/. The file is named from the moment the data is from
+(asof).
 """
 import os
 import sys

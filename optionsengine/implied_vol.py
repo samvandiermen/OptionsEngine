@@ -1,13 +1,14 @@
 """Implied volatility solver for European options under Black-Scholes.
 
-There is no formula for it. Black-Scholes turns volatility into a price, and that
-cannot be rearranged, so we have to search for the volatility that fits.
+There is no formula for it. Black-Scholes turns volatility into a price and that
+cannot be rearranged, so we search for the volatility that fits.
 
-Two methods, tried in order:
+Two methods, tried in order.
 
-    Newton-Raphson   converges quadratically near the root but can misbehave 
-                    (overshoot to a negative sigma, or stall) when vega is very small. 
-    bisection        converges linearly, but guaranteed to converge, used whenever Newton gives up.
+    Newton-Raphson   Converges quadratically near the answer, but it can misbehave when vega is
+                     very small, stepping to a negative sigma or stalling.
+    bisection        Converges linearly, but it always converges. Used whenever Newton
+                     gives up.
 
 Every result records which method solved it. That is what lets us report how
 often the fallback was needed and see where those quotes sit on the surface.
@@ -18,14 +19,14 @@ from optionsengine.config import IV_INITIAL_GUESS
 from optionsengine.pricing import bs_price, check_inputs, normalise_option_type
 from optionsengine.greeks import vega
 
-# The range of volatilities we search: 0.01% to 500% a year.
+# The range of volatilities we search, 0.01% to 500% a year.
 SIGMA_BOUNDS = (1e-4, 5.0)
 
 # The model price must land within this of the market price to call it solved.
 PRICE_TOL = 1e-8
 
-# Vega floor below which the price is too flat in volatility to trust, as a
-# fraction of S so it scales with the underlying.
+# Vega floor below which the price barely moves with volatility, so we do not
+# trust the answer. A fraction of S, so it scales with the underlying.
 MIN_VEGA_FRACTION = 1e-6
 
 # Maximum number of iterations: Newton is fast but can fail, bisection is slow but can't.
@@ -165,8 +166,8 @@ def implied_vol(price, S, K, T, r, option_type):
         sigma, iterations, method = sigma_extra, iterations + it_extra, "bisection"
 
     # Matching the price is not enough. Where the price hardly moves with
-    # volatility, many different volatilities match it equally well and the
-    # one we happened to land on means nothing, so say so instead.
+    # volatility, many different volatilities match it about equally well, so
+    # the one we landed on does not really tell us anything. Report a failure.
     if vega(S, K, T, r, sigma) < MIN_VEGA_FRACTION * S:
         return _failed("price barely moves with volatility here", iterations)
 

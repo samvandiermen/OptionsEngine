@@ -1,20 +1,20 @@
 """Closed-form Black-Scholes Greeks for European options.
 
-Each one measures how the option price responds to a change in one input:
+Each Greek measures how the option price responds to a change in one input.
 
     delta   the underlying price
-    gamma   the underlying price again, second derivative: how fast delta moves
+    gamma   the underlying price again, second derivative, how fast delta moves
     vega    volatility
     theta   time
     rho     the interest rate
 
-These are the plain mathematical derivatives. Traders usually rescale them:
-vega per 1% of volatility is vega / 100, theta per day is theta / 365.
+These are the plain mathematical derivatives. Traders usually rescale them.
+Vega per 1% of volatility is vega / 100, and theta per day is theta / 365.
 
 Gamma and vega take no option type, because they are the same for calls and
-puts. A call and a put with the same strike and expiry differ by a forward,
-which is a straight line in S and has no volatility in it at all, so the
-curvature and the volatility sensitivity have to match.
+puts. A call and a put with the same strike and expiry differ by a forward. A
+forward is a straight line in S with no volatility in it, so the curvature and
+the volatility sensitivity have to match.
 """
 
 import math
@@ -25,7 +25,7 @@ from optionsengine.pricing import CALL, check_inputs, d1_d2, normalise_option_ty
 class Greeks:
     """All five Greeks for one option, bundled together.
 
-    delta, gamma, vega, theta, rho -- see each function above for what it means.
+    delta, gamma, vega, theta, rho. See each function above for what it means.
     """
 
     def __init__(self, delta, gamma, vega, theta, rho):
@@ -40,7 +40,7 @@ def _check(S, K, T, sigma, option_type=None):
     """Same checks as the pricer, plus T and sigma strictly above zero.
 
     The pricer allows T = 0 and sigma = 0 and returns the intrinsic value. The
-    Greeks cannot: they are slopes, and at those points the slope is either
+    Greeks cannot. They are slopes, and at those points the slope is either
     infinite or undefined.
     """
     check_inputs(S, K, T, sigma, option_type)
@@ -99,8 +99,8 @@ def theta(S, K, T, r, sigma, option_type):
         call:  -S*n(d1)*sigma / (2*sqrt(T)) - r*K*exp(-rT)*N(d2)
         put:   -S*n(d1)*sigma / (2*sqrt(T)) + r*K*exp(-rT)*N(-d2)
 
-    Usually negative: an option loses value as expiry approaches. Divide by
-    365 for the change per calendar day.
+    Usually negative, since an option loses value as expiry approaches. Divide
+    by 365 for the change per calendar day.
     """
     option_type = normalise_option_type(option_type)
     _check(S, K, T, sigma, option_type)
@@ -137,8 +137,8 @@ def rho(S, K, T, r, sigma, option_type):
 def all_greeks(S, K, T, r, sigma, option_type):
     """Compute all five Greeks for one option in one call.
 
-    A thin wrapper around the five functions above -- for when every
-    sensitivity is needed for the same option, instead of calling each on its
+    A thin wrapper around the five functions above. Use it when you need every
+    sensitivity for the same option, instead of calling each on its
     own and repeating the same S, K, T, r, sigma five times.
     """
     return Greeks(

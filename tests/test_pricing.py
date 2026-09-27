@@ -1,9 +1,9 @@
 """Tests for the Black-Scholes pricer.
 
-The strategy here is to check the formula against things we know independently
-of the code: published textbook values, put-call parity, and the limiting cases
-where the option price has an obvious answer. If all of those hold, the pricer
-is trustworthy enough to build the Greeks and the IV solver on top of it.
+The idea is to check the formula against things we know without the code.
+Published textbook values, put-call parity, and the limiting cases where the
+option price has an obvious answer. If all of those hold, the pricer is solid
+enough to build the Greeks and the IV solver on top of it.
 """
 
 import math
@@ -29,9 +29,9 @@ def test_matches_textbook_put_value():
 def test_put_call_parity():
     """C - P = S - K * exp(-rT) must hold exactly, for every set of inputs.
 
-    Parity follows from a no-arbitrage argument, not from the Black-Scholes
-    model, so it is a genuinely independent check on the two formulas: an
-    algebra error in either one will almost certainly break it.
+    Parity comes from a no-arbitrage argument, not from the Black-Scholes model,
+    so it is a genuinely independent check on the two formulas. An algebra error
+    in either one will almost certainly break it.
     """
     for S in (80.0, 100.0, 130.0):
         for K in (90.0, 100.0, 110.0):
@@ -47,11 +47,10 @@ def test_put_call_parity():
 def test_price_increases_with_volatility():
     """Price must be strictly increasing in sigma.
 
-    This is the property the implied volatility solver depends on. Because the
-    mapping sigma -> price is monotone, there is exactly one volatility that
-    reproduces a given price, and bisection on a bracketing interval is
-    guaranteed to find it. If this test ever fails, the bisection fallback in
-    implied_vol.py is no longer safe.
+    This is the property the implied volatility solver depends on. Since price
+    only ever rises with sigma, exactly one volatility matches a given price,
+    and bisection on a bracketing interval is guaranteed to find it. If this
+    test ever fails, the bisection fallback in implied_vol.py is no longer safe.
     """
     for option_type in ("call", "put"):
         prices = [
@@ -71,8 +70,8 @@ def test_deep_out_of_the_money_is_nearly_worthless():
 
 def test_deep_in_the_money_call_approaches_discounted_intrinsic():
     """A call so far in the money it is certain to be exercised is worth
-    S - K*exp(-rT): you will pay the strike at expiry, so you owe its
-    present value today."""
+    S - K*exp(-rT). You will pay the strike at expiry, so you owe its present
+    value today."""
     S, K, T, r = 1000.0, 10.0, 1.0, 0.03
     price = bs_price(S, K, T, r, 0.2, "call")
     assert price == pytest.approx(S - K * math.exp(-r * T), abs=1e-6)
@@ -87,7 +86,7 @@ def test_expired_option_is_worth_intrinsic_value():
 
 def test_zero_volatility_discounts_the_strike():
     """With no uncertainty the payoff is known, so the call is worth
-    max(S - K*exp(-rT), 0) -- the strike is discounted, the spot is not."""
+    max(S - K*exp(-rT), 0). The strike is discounted, the spot is not."""
     S, K, T, r = 100.0, 90.0, 2.0, 0.05
     expected = S - K * math.exp(-r * T)
     assert bs_price(S, K, T, r, 0.0, "call") == pytest.approx(expected)
@@ -138,9 +137,9 @@ def test_invalid_inputs_raise(kwargs):
 def test_returns_plain_floats():
     """The pricer must return a builtin float in every branch.
 
-    scipy returns numpy scalars, and the degenerate branches return plain
+    scipy returns numpy scalars, and the special-case branches return plain
     floats, so without an explicit cast the return type would depend on the
-    inputs. Downstream code (and CSV output) is simpler with one type.
+    inputs. Downstream code and CSV output are simpler with one type.
     """
     normal = bs_price(100.0, 100.0, 1.0, 0.03, 0.2, "call")
     expired = bs_price(120.0, 100.0, 0.0, 0.03, 0.2, "call")

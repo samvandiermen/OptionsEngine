@@ -10,13 +10,13 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import PchipInterpolator
 
-# The shared grid every smile is evaluated at, so expiries line up into one
-# surface. Matches the chain window's moneyness bounds (ln 0.80, ln 1.20).
+# The shared grid every smile is evaluated at, so the expiries line up into one
+# surface. Matches the chain window's moneyness bounds, ln(0.80) to ln(1.20).
 DEFAULT_LOG_MONEYNESS_GRID = np.linspace(-0.22, 0.18, 41)
 
 
 def add_log_moneyness(quotes):
-    """Add a log_moneyness column: ln(K / F). Needs forward already added."""
+    """Add a log_moneyness column, ln(K / F). Needs forward already added."""
     quotes = quotes.copy()
     quotes["log_moneyness"] = np.log(quotes["strike"] / quotes["forward"])
     return quotes
@@ -25,11 +25,11 @@ def add_log_moneyness(quotes):
 def build_surface(quotes, iv_column, log_moneyness_grid=DEFAULT_LOG_MONEYNESS_GRID):
     """Interpolate each expiry's smile onto a shared log-moneyness grid.
 
-    One row per expiry, indexed by years_to_expiry and sorted; one column
-    per point in log_moneyness_grid. A grid point outside an expiry's own
-    strike range comes back NaN. We never guess a smile shape past what
-    that expiry's own quotes cover. Expiries with fewer than two usable
-    quotes are skipped, since there's nothing to interpolate from.
+    One row per expiry, indexed by years_to_expiry and sorted. One column per
+    point in log_moneyness_grid. A grid point outside an expiry's own strike
+    range comes back NaN, since we never guess a smile shape past what that
+    expiry's own quotes cover. Expiries with fewer than two usable quotes are
+    skipped, because there is nothing to interpolate from.
     """
     rows = {}
     for years, group in quotes.groupby("years_to_expiry"):

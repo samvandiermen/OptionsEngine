@@ -1,10 +1,9 @@
 """
-Black-Scholes pricing for European options.
+Black-Scholes pricing for European calls and puts.
 
-This is the foundation of the whole project: the Greeks (greeks.py) are the
-derivatives of the price function defined here, and the implied volatility
-solver (implied_vol.py) runs this function backwards to find the volatility
-that reproduces an observed market price.
+Everything else in the project is built on this. The Greeks in greeks.py are the
+derivatives of the price function here, and the solver in implied_vol.py runs
+this function backwards to find the volatility that matches a market price.
 
 Model assumptions (see README for full discussion):
     - The underlying follows geometric Brownian motion with constant
@@ -15,7 +14,7 @@ Model assumptions (see README for full discussion):
       borrowing/lending at the risk-free rate, no arbitrage).
 
 These functions price one option at a time. Handling many at once would run
-faster, but we only ever price a few hundred, so readable formulas win.
+faster, but we only ever price a few hundred, so the readable version win.
 """
 
 import math
@@ -27,10 +26,10 @@ PUT = "put"
 
 
 def check_inputs(S, K, T, sigma, option_type=None):
-    """Check the inputs make sense, and raise a clear error if they do not.
+    """Check the inputs make sense and raise a clear error if not.
 
-    Shared with greeks.py. Better to stop here than let a bad number become a
-    wrong answer somewhere deep in the implied volatility solver.
+    Shared with greeks.py. Better to stop a bad number here than let it turn
+    into a wrong answer somewhere deep in the IV solver.
     """
     if S <= 0:
         raise ValueError(f"Spot price S must be positive, got {S}")
@@ -47,8 +46,8 @@ def check_inputs(S, K, T, sigma, option_type=None):
 def normalise_option_type(option_type):
     """Turn any spelling of call or put into one standard form.
 
-    Some callers write 'C' and 'P', others write 'call' and 'put'. Accept
-    both, in any capitalisation.
+    Some callers write 'C' and 'P', others write 'call' and 'put'. Accept both,
+    in any capitalisation.
     """
     text = str(option_type).strip().lower()
     if text in ("c", "call"):
@@ -64,7 +63,8 @@ def d1_d2(S, K, T, r, sigma):
         d1 = [ln(S/K) + (r + sigma^2 / 2) * T] / (sigma * sqrt(T))
         d2 = d1 - sigma * sqrt(T)
 
-    Needs T and sigma above zero. bs_price handles those cases before calling this.
+    Needs T and sigma above zero. bs_price handles the cases where they are not
+    before it gets here.
 
     Parameters
     ----------
@@ -147,7 +147,7 @@ def bs_price(S, K, T, r, sigma, option_type):
 def forward_price(S, T, r):
     """The forward price of the underlying, F = S * exp(r * T).
 
-    With no dividends, just today's price grown at the risk-free rate. The
-    surface uses it as the centre of the smile: at the money means K = F.
+    With no dividends this is just today's price grown at the risk-free rate.
+    The surface uses it as the centre of the smile, so at the money means K = F.
     """
     return S * math.exp(r * T)

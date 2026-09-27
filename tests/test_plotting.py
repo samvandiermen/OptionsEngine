@@ -1,8 +1,8 @@
-"""Tests for plotting.py: that each chart is wired to the right data.
+"""Tests for plotting.py. Each chart is wired to the right data.
 
-Not testing what the charts look like -- just that x/y/z end up mapped to
-the right columns, since a swapped axis or wrong column is an easy mistake
-that would look fine in code and wrong in the picture.
+Not testing what the charts look like, just that x/y/z end up mapped to the
+right columns. A swapped axis or wrong column is an easy mistake that would
+look fine in code and wrong in the picture.
 """
 import numpy as np
 import pandas as pd
@@ -48,7 +48,7 @@ def test_plot_surface_axis_ranges_and_ticks():
     assert scene.xaxis.range == (-0.2, 0.2)  # fixed view window, not derived from the data
     assert scene.xaxis.dtick == pytest.approx(0.05)
     assert scene.yaxis.dtick == pytest.approx(0.1)
-    # z floors/ceils to the nearest 0.05 around the data's actual min/max (0.20 and 0.30 here)
+    # z rounds out to the nearest 0.05 around the data's actual min and max (0.20 and 0.30 here)
     assert scene.zaxis.range == pytest.approx((0.20, 0.30))
     assert scene.zaxis.dtick == pytest.approx(0.05)
 
@@ -69,7 +69,7 @@ def test_plot_smiles_filters_to_the_requested_expiries():
 
 
 def test_plot_term_structure_uses_the_column_closest_to_zero():
-    # columns are -0.1, 0.0, 0.1 -- 0.0 is the exact ATM column
+    # columns are -0.1, 0.0, 0.1, so 0.0 is the exact ATM column
     fig = plot_term_structure(SURFACE)
     assert list(fig.data[0].x) == list(SURFACE.index)
     assert list(fig.data[0].y) == list(SURFACE[0.0])

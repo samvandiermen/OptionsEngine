@@ -1,9 +1,9 @@
 """Tests for the implied volatility solver.
 
-The main test is a round trip: pick a volatility, price the option with it, then
+The main test is a round trip. Pick a volatility, price the option with it, then
 ask the solver to recover it. It should hand back what we started with.
 
-The rest cover the awkward parts -- when Newton gives up, when a quote cannot be
+The rest cover the awkward parts. When Newton gives up, when a quote cannot be
 solved at all, and whether the answer matches an independent solver.
 """
 
@@ -18,10 +18,10 @@ R = 0.03
 # Strikes measured in standard deviations from the money, not in percent.
 #
 # Percent is the wrong yardstick. A strike 10% away is ordinary with a year to
-# run and absurd with a week to run: the same 10% is under one standard
+# run and absurd with a week to run. The same 10% is under one standard
 # deviation in the first case and about seven in the second. Real chains are
 # quoted around the money in this sense, so sigma * sqrt(T) is the scale that
-# keeps every combination below a plausible one.
+# keeps every combination realistic.
 ROUND_TRIP = [
     (S, S * math.exp(z * sigma * math.sqrt(T)), T, sigma, option_type)
     for S in (100.0, 5000.0)
@@ -37,7 +37,7 @@ def test_round_trip_recovers_the_volatility(S, K, T, sigma, option_type):
     """Price it with a known volatility, then solve for it and get it back.
 
     Not machine precision, because we stop once the price matches to within
-    PRICE_TOL and that leaves roughly PRICE_TOL divided by vega in the
+    PRICE_TOL, and that leaves roughly PRICE_TOL divided by vega in the
     volatility. Near the money vega is healthy, so what is left is tiny.
     """
     price = bs_price(S, K, T, R, sigma, option_type)
@@ -68,7 +68,7 @@ def test_bisection_takes_over_and_still_gets_it_right(S, K, T, sigma, option_typ
     """Far from the money with little time left, Newton gives up.
 
     Vega is small there, so dividing by it throws the next guess outside the
-    range we are searching. Bisection cannot do that: it only ever halves a
+    range we are searching. Bisection cannot do that. It only ever halves a
     range it already knows contains the answer.
     """
     price = bs_price(S, K, T, R, sigma, option_type)
@@ -82,7 +82,7 @@ def test_bisection_takes_over_and_still_gets_it_right(S, K, T, sigma, option_typ
 def test_agrees_with_an_independent_solver(option_type):
     """Cross-check against scipy's brentq on the same problem.
 
-    Ours is hand-written, so this confirms the answer rather than the method.
+    Ours is hand-written, so this confirms the answer, not the method.
     """
     S, K, T, sigma = 100.0, 108.0, 0.4, 0.32
     price = bs_price(S, K, T, R, sigma, option_type)
@@ -98,7 +98,7 @@ def test_agrees_with_an_independent_solver(option_type):
 
 @pytest.mark.parametrize("price", [0.0, -1.0, float("nan"), float("inf")])
 def test_unusable_prices_fail_without_raising(price):
-    """A missing or nonsense quote is data to filter out, not a crash."""
+    """A missing or nonsense quote is something to filter out, not a crash."""
     result = implied_vol(price, 100.0, 100.0, 0.5, R, "call")
 
     assert result.method == "failed"
@@ -107,7 +107,7 @@ def test_unusable_prices_fail_without_raising(price):
 
 
 def test_price_below_the_no_arbitrage_minimum_fails():
-    """No volatility can produce a price under the floor, so do not pretend."""
+    """No volatility can produce a price under the floor, so do not make one up."""
     floor = max(100.0 - 90.0 * math.exp(-R * 0.5), 0.0)
     result = implied_vol(floor - 1.0, 100.0, 90.0, 0.5, R, "call")
 
@@ -131,8 +131,8 @@ def test_price_above_the_search_range_fails():
 )
 def test_deep_in_the_money_near_expiry_has_no_answer(S, K, T, option_type):
     """The price sits on its no-arbitrage bound and stops responding to
-    volatility, so every volatility fits equally well and none of them mean
-    anything. Reporting a number here would be the worst outcome: it would look
+    volatility, so every volatility fits equally well and none of them tell us
+    anything. Reporting a number here would be the worst outcome. It would look
     like a real data point on the surface."""
     price = bs_price(S, K, T, R, 0.20, option_type)
     result = implied_vol(price, S, K, T, R, option_type)
@@ -147,7 +147,7 @@ def test_far_out_of_the_money_near_expiry_has_no_answer():
 
     Worth a fraction of a cent, and in the market it would be quoted 0.00 bid.
     There is no volatility to recover from a price like that, so the solver
-    says so rather than returning a number that would look real on a surface.
+    says so rather than returning a number that would look real on the surface.
     """
     S, K, T, sigma = 100.0, 110.0, 7 / 365, 0.10
     price = bs_price(S, K, T, R, sigma, "call")
@@ -167,7 +167,7 @@ def test_far_out_of_the_money_near_expiry_has_no_answer():
     ],
 )
 def test_bad_contract_details_raise(kwargs):
-    """These come from our own code, not from the market, so they are bugs."""
+    """These come from our own code, not from the market, so they are our bugs."""
     with pytest.raises(ValueError):
         implied_vol(5.0, r=R, option_type="call", **kwargs)
 

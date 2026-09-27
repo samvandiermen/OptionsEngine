@@ -1,6 +1,6 @@
-"""CLI: pull a fresh snapshot, solve IV, redraw the surface, wait for Enter,
-repeat. Writes figures/surface.html each round; open that file once and
-refresh it in the browser to see the latest pass.
+"""Command line tool. Pull a fresh snapshot, solve IV, redraw the surface, wait
+for Enter, repeat. Writes figures/surface.html each round. Open that file once
+and refresh it in the browser to see the latest pass.
 """
 import os
 import sys

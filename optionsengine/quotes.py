@@ -1,7 +1,8 @@
 """
-Quote hygiene: turn the raw snapshot into quotes worth solving implied
-volatility from. Adds years to expiry and the forward price, drops bad
-quotes, then keeps OTM only -- calls above the forward, puts below.
+Quote hygiene. Turn the raw snapshot into quotes worth solving implied
+volatility from. Adds years to expiry and the forward price, drops bad quotes,
+then keeps out-of-the-money options only, so calls above the forward and puts
+below.
 """
 import re
 import pandas as pd
@@ -45,7 +46,8 @@ def add_mid_price(quotes):
 
 
 def drop_bad_quotes(quotes, max_spread_fraction=MAX_SPREAD_FRACTION):
-    """Drop missing, zero-bid, crossed/locked, or too-wide-spread quotes."""
+    """Drop quotes that are missing, have a zero bid, are crossed or locked, or
+    have a spread too wide to trust."""
     quotes = quotes.dropna(subset=["bid", "ask"])
     quotes = quotes[quotes["bid"] > 0]
     quotes = quotes[quotes["ask"] > quotes["bid"]]  # drops crossed and locked markets
@@ -55,9 +57,9 @@ def drop_bad_quotes(quotes, max_spread_fraction=MAX_SPREAD_FRACTION):
 
 
 def select_otm(quotes):
-    """Keep out-of-the-money options: calls at or above the forward, puts strictly below.
-    A strike sitting exactly on the forward counts as the call, so it is kept once, not
-    twice. Needs forward already added."""
+    """Keep out-of-the-money options. Calls at or above the forward, puts strictly
+    below it. A strike sitting exactly on the forward counts as the call, so it is
+    kept once, not twice. Needs forward already added."""
     calls = quotes[(quotes["right"] == "C") & (quotes["strike"] >= quotes["forward"])]
     puts = quotes[(quotes["right"] == "P") & (quotes["strike"] < quotes["forward"])]
     return pd.concat([calls, puts])
@@ -65,7 +67,7 @@ def select_otm(quotes):
 
 def clean_quotes(quotes, weekly_root, monthly_root, am_hour, pm_hour, r,
                   max_spread_fraction=MAX_SPREAD_FRACTION):
-    """Run the full pipeline: drop bad quotes, add years/forward/mid, keep OTM only."""
+    """Run the whole pipeline. Drop bad quotes, add years, forward and mid, keep OTM only."""
     quotes = drop_bad_quotes(quotes, max_spread_fraction)
     quotes = add_years_to_expiry(quotes, weekly_root, monthly_root, am_hour, pm_hour)
     quotes = add_forward(quotes, r)

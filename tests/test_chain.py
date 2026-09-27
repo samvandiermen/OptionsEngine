@@ -1,7 +1,7 @@
-"""Tests for chain.py: which expiries and strikes are worth asking for.
+"""Tests for chain.py. Which expiries and strikes are worth asking for.
 
-These are pure functions over plain data. No yfinance call or network access
-is needed. The DataFrames here stand in for what option_chain() would return.
+These are pure functions over plain data. No yfinance call or network access is
+needed. The DataFrames here stand in for what option_chain() would return.
 """
 
 import datetime
@@ -61,7 +61,7 @@ def test_select_moneyness_uses_the_forward_not_the_spot():
 
     F = 100 * exp(0.05 * 2) = 110.52, so the top of the window is 1.20 * F =
     132.6. A strike of 121 is above 1.20 * spot but still well inside the
-    forward-based window, so it must be kept, not dropped.
+    forward-based window, so it must be kept.
     """
     contracts = pd.DataFrame({"strike": [119.0, 121.0]})
     kept = select_moneyness(

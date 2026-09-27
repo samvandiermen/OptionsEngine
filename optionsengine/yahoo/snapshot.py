@@ -2,7 +2,7 @@
 Pull the yfinance option chain within the configured window and shape it into
 one flat DataFrame of raw quotes.
 
-Records raw values and calculates nothing. Mid price, hygiene and implied
+Records the raw values and calculates nothing. Mid price, hygiene and implied
 volatility all happen later, on the table this returns.
 """
 from datetime import datetime
@@ -22,9 +22,9 @@ def fetch_snapshot(underlying, r, min_years, max_years, moneyness_min, moneyness
                     pacing_seconds):
     """Pull one chain snapshot for the given underlying and return a raw DataFrame.
 
-    One row per contract kept: expiry, strike, right, the raw contract symbol,
-    bid, ask, last, volume, open interest, Yahoo's own implied vol, the
-    underlying price, and asof. Nothing here is a fair price yet. quotes.py
+    One row per contract kept, with expiry, strike, right, the raw contract
+    symbol, bid, ask, last, volume, open interest, Yahoo's own implied vol, the
+    underlying price, and asof. None of this is a fair price yet. quotes.py
     decides that later.
     """
     ticker = yf.Ticker(underlying.yahoo_ticker)

@@ -1,7 +1,7 @@
-"""Tests for surface.py: log-moneyness and the per-expiry interpolated grid.
+"""Tests for surface.py. Log-moneyness and the per-expiry interpolated grid.
 
-Builds small synthetic quotes rather than pulling live data -- these are
-pure functions, so no network is needed.
+Builds small synthetic quotes rather than pulling live data. These are pure
+functions, so no network is needed.
 """
 import math
 import numpy as np
@@ -72,7 +72,7 @@ def test_build_surface_drops_missing_iv_before_interpolating():
         "log_moneyness": [-0.1, 0.0, 0.1],
         "iv": [0.25, float("nan"), 0.22],
     })
-    # the NaN row is dropped, leaving two usable points -- still interpolates
+    # the NaN row is dropped, leaving two usable points, so it still interpolates
     surface = build_surface(quotes, iv_column="iv", log_moneyness_grid=grid)
     assert not math.isnan(surface.loc[1.0, 0.0])
 

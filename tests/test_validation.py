@@ -1,7 +1,7 @@
-"""Tests for validation.py: our IV vs Yahoo's, MAE/RMSE by bucket and method.
+"""Tests for validation.py. Our IV vs Yahoo's, and MAE/RMSE by bucket and method.
 
-Builds small synthetic quotes rather than pulling live data -- these are
-pure functions once you have a DataFrame, so no network is needed.
+Builds small synthetic quotes rather than pulling live data. These are pure
+functions once you have a DataFrame, so no network is needed.
 """
 import math
 import pandas as pd
@@ -38,7 +38,7 @@ def test_add_error_is_ours_minus_yahoos():
 def test_add_moneyness_bucket_uses_strike_over_forward():
     quotes = pd.DataFrame({"strike": [92.0, 100.0], "forward": [100.0, 100.0]})
     result = add_moneyness_bucket(quotes)
-    # 92/100 = 0.92 -> (0.90, 0.95]; 100/100 = 1.00 -> (0.95, 1.00]
+    # 92/100 = 0.92 lands in (0.90, 0.95]. 100/100 = 1.00 lands in (0.95, 1.00].
     assert str(result["moneyness_bucket"].iloc[0]) == "(0.9, 0.95]"
     assert str(result["moneyness_bucket"].iloc[1]) == "(0.95, 1.0]"
 

@@ -1,7 +1,7 @@
-"""Tests for quotes.py: hygiene, mid price, and OTM selection.
+"""Tests for quotes.py. Hygiene, mid price, and OTM selection.
 
 Builds small DataFrames shaped like what snapshot.py returns, rather than
-pulling live data -- these are pure functions, so no network is needed.
+pulling live data. These are pure functions, so no network is needed.
 """
 from datetime import datetime, timezone
 import pandas as pd
@@ -32,7 +32,7 @@ def test_add_years_to_expiry_uses_the_right_settlement_per_row():
 
 def test_add_years_to_expiry_raises_on_an_unparseable_symbol():
     """A contract symbol we cannot read the root from is a clear error, not a
-    silent crash deeper in."""
+    silent crash further down."""
     quotes = pd.DataFrame({
         "contract_symbol": ["not-a-real-symbol"],
         "expiry": ["2026-09-01"],

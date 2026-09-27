@@ -1,9 +1,9 @@
-"""Tests for time_utils.py: years to expiry and the AM/PM settlement lookup.
+"""Tests for time_utils.py. Years to expiry and the AM/PM settlement lookup.
 
-The important case here is the DST boundary -- a bug slipped through once
-already (constructing both datetimes from the same tzinfo object makes
-Python silently skip the offset change), so that scenario gets its own
-test, not just a plausible-looking round number.
+The case that matters here is the DST boundary. A bug slipped through once
+already, where building both datetimes from the same tzinfo object makes Python
+silently skip the offset change. So that scenario gets its own test, not just a
+plausible-looking round number.
 """
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
@@ -26,14 +26,14 @@ def test_plain_week_same_time_of_day():
 
 
 def test_dst_boundary_is_not_silently_dropped():
-    """Regression test for a real bug: constructing the settlement datetime
-    from asof.tzinfo directly makes Python skip timezone adjustment when
-    subtracting two datetimes that share the same tzinfo object, silently
-    losing the DST hour.
+    """Regression test for a real bug. Building the settlement datetime from
+    asof.tzinfo directly makes Python skip the timezone adjustment when
+    subtracting two datetimes that share the same tzinfo object, so it silently
+    loses the DST hour.
 
-    2026-11-01 is when US DST ends. 11 wall-clock days at the same local
-    hour should be 265 real hours elapsed, not 264, since the clocks fall
-    back an hour partway through.
+    2026-11-01 is when US DST ends. 11 wall-clock days at the same local hour
+    should be 265 real hours elapsed, not 264, since the clocks fall back an
+    hour partway through.
     """
     asof = datetime(2026, 10, 25, 12, 0, tzinfo=ZoneInfo("America/New_York"))
     years = years_to_expiry(asof, "2026-11-05", 12.0)

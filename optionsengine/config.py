@@ -1,20 +1,20 @@
-"""Settings for the live data pipeline: underlying, risk-free rate, chain window, pacing."""
+"""Settings for the live data pipeline. Underlying, risk-free rate, chain window, pacing."""
 
-# Risk-free rate, constant, not fetched live.
+# Risk-free rate. Constant, not fetched live.
 r = 0.04
 
 # Starting volatility for the implied vol solver. A flat 20%, not a formula.
 # See _newton in implied_vol.py for why.
 IV_INITIAL_GUESS = 0.20
 
-# Which underlying is active. Change this to switch underlying.
+# Which underlying is active. Change this to switch to another one.
 ACTIVE_SYMBOL = "SPX"
 
-# Chain window: how far from the money and how far out in time to pull.
+# Chain window. How far from the money and how far out in time to pull.
 MONEYNESS_BOUNDS = (0.80, 1.20)  # K / F
 EXPIRY_YEARS_BOUNDS = (7 / 365, 1.0)  # one week to one year
 
-# Seconds between yfinance requests, to stay under Yahoo's rate limit.
+# Seconds to wait between yfinance requests, to stay under Yahoo's rate limit.
 PACING_SECONDS = 0.1
 
 # Settlement times, hours after midnight ET. Same for every underlying.
@@ -23,7 +23,7 @@ PM_SETTLEMENT_HOUR = 16.0  # weekly root
 
 
 class UnderlyingConfig:
-    """One underlying's Yahoo ticker and its two contractSymbol roots.
+    """One underlying's Yahoo ticker and its two contract symbol roots.
 
     yahoo_ticker    Yahoo ticker, e.g. '^SPX'
     weekly_root     PM-settled weekly root, e.g. 'SPXW'
@@ -38,7 +38,7 @@ class UnderlyingConfig:
         self.exchange_tz = exchange_tz
 
 
-# One row per supported underlying.
+# One row per supported underlying. Adding another index means adding a row here.
 UNDERLYINGS = {
     "SPX": UnderlyingConfig(yahoo_ticker="^SPX", weekly_root="SPXW", monthly_root="SPX",
                              exchange_tz="America/New_York"),
